@@ -1,3 +1,7 @@
 spring:
   application:
     name: streaming-demo
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:your-api-key-here}

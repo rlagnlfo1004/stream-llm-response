@@ -1,0 +1,25 @@
+# ===== macOS =====
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ===== IDE =====
+.idea/
+*.iml
+.vscode/
+
+# ===== Spring Boot / Gradle =====
+server/build/
+server/.gradle/
+server/out/
+!server/gradle/wrapper/gradle-wrapper.jar
+
+# ===== Node / Vite =====
+web/node_modules/
+web/dist/
+web/.vite/
+
+# ===== Environment / Secrets =====
+.env
+.env.local
+*.env
