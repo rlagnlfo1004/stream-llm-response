@@ -32,16 +32,11 @@ public class GeminiService {
             **설명:** [속담에 대한 간단한 설명 2~3문장]
             """;
 
-    private final RestClient restClient;
-    private final ObjectMapper objectMapper;
+    private final RestClient restClient = RestClient.create();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${gemini.api.key}")
     private String apiKey;
-
-    public GeminiService(RestClient.Builder builder, ObjectMapper objectMapper) {
-        this.restClient = builder.build();
-        this.objectMapper = objectMapper;
-    }
 
     public void streamProverb(SseEmitter emitter) {
         Map<String, Object> requestBody = Map.of(
