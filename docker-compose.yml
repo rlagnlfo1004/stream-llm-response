@@ -1,0 +1,14 @@
+services:
+  backend:
+    build: ./server
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    expose:
+      - "8080"
+
+  frontend:
+    build: ./web
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend

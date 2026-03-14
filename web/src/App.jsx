@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import './index.css'
 
-const API_URL = 'http://localhost:8080/api/proverb/stream'
+const API_URL = '/api/proverb/stream'
 
 export default function App() {
   const [content, setContent] = useState('')
