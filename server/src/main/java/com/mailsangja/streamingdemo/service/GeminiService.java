@@ -27,14 +27,30 @@ public class GeminiService {
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent";
 
     private static final String PROMPT = """
-            한국어 속담 하나를 선택하여 마크다운 형식으로 소개해줘.
-            다음 형식을 정확히 따라줘:
+            한국어 속담 3개를 골라 아래 마크다운 템플릿에 맞춰 상세하게 소개해줘.
+            각 속담마다 다음 구조를 반드시 지켜줘:
 
-            ## [속담]
+            ---
 
-            **뜻:** [속담의 의미를 한 문장으로]
+            ## 🔖 [속담 원문]
 
-            **설명:** [속담에 대한 간단한 설명 2~3문장]
+            > [속담을 한 줄 인용구로]
+
+            ### 📖 뜻
+            속담의 의미를 2~3문장으로 풀어서 설명해줘.
+
+            ### 🌱 유래
+            이 속담이 생겨난 배경이나 역사적 맥락을 3~4문장으로 설명해줘.
+
+            ### 💡 활용 예시
+            실생활에서 이 속담을 어떻게 쓸 수 있는지 구체적인 상황과 대화 예시를 들어줘.
+
+            ### 🔗 비슷한 표현
+            - 유사한 속담이나 사자성어를 2~3개 나열해줘.
+
+            ---
+
+            속담 3개를 모두 위 형식으로 작성해줘.
             """;
 
     private final RestClient restClient = RestClient.create();
