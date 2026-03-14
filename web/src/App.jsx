@@ -30,10 +30,16 @@ export default function App() {
       setStreaming(false)
     })
 
+    es.addEventListener('error', (e) => {
+      es.close()
+      setStreaming(false)
+      setError(e.data || '서버 오류가 발생했습니다.')
+    })
+
     es.onerror = () => {
       es.close()
       setStreaming(false)
-      setError('스트리밍 중 오류가 발생했습니다.')
+      setError('스트리밍 연결 오류가 발생했습니다.')
     }
   }
 

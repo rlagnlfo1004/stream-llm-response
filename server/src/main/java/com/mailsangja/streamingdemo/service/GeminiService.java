@@ -2,7 +2,10 @@ package com.mailsangja.streamingdemo.service;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -17,6 +20,8 @@ import java.util.Map;
 
 @Service
 public class GeminiService {
+
+    private static final Logger log = LoggerFactory.getLogger(GeminiService.class);
 
     private static final String GEMINI_URL =
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent";
@@ -51,10 +56,21 @@ public class GeminiService {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(requestBody)
                     .exchange((req, res) -> {
+                        HttpStatusCode status = res.getStatusCode();
+                        log.info("Gemini response status: {}", status);
+
+                        if (status.isError()) {
+                            String errorBody = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
+                            log.error("Gemini API error [{}]: {}", status, errorBody);
+                            sendErrorAndComplete(emitter, "Gemini API 오류: " + status);
+                            return null;
+                        }
+
                         try (BufferedReader reader = new BufferedReader(
                                 new InputStreamReader(res.getBody(), StandardCharsets.UTF_8))) {
                             String line;
                             while ((line = reader.readLine()) != null) {
+                                log.debug("SSE line: {}", line);
                                 if (!line.startsWith("data: ")) continue;
 
                                 String json = line.substring(6).trim();
@@ -70,28 +86,31 @@ public class GeminiService {
                                                 .name("message")
                                                 .data(textNode.asText()));
                                     }
-                                } catch (Exception ignored) {
-                                    // skip malformed chunk
+                                } catch (Exception e) {
+                                    log.warn("Failed to parse chunk: {}", line, e);
                                 }
                             }
                         } catch (IOException e) {
+                            log.error("Stream read error", e);
                             emitter.completeWithError(e);
                             return null;
                         }
 
-                        try {
-                            emitter.send(SseEmitter.event().name("done").data(""));
-                            emitter.complete();
-                        } catch (IOException e) {
-                            emitter.completeWithError(e);
-                        }
+                        emitter.send(SseEmitter.event().name("done").data(""));
+                        emitter.complete();
                         return null;
                     });
         } catch (Exception e) {
-            try {
-                emitter.completeWithError(e);
-            } catch (Exception ignored) {
-            }
+            log.error("Gemini request failed", e);
+            sendErrorAndComplete(emitter, e.getMessage());
+        }
+    }
+
+    private void sendErrorAndComplete(SseEmitter emitter, String message) {
+        try {
+            emitter.send(SseEmitter.event().name("error").data(message));
+            emitter.complete();
+        } catch (Exception ignored) {
         }
     }
 }
