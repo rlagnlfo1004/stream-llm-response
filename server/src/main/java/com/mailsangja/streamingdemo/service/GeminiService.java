@@ -63,6 +63,9 @@ public class GeminiService {
         Map<String, Object> requestBody = Map.of(
                 "contents", List.of(
                         Map.of("parts", List.of(Map.of("text", PROMPT)))
+                ),
+                "generationConfig", Map.of(
+                        "thinkingConfig", Map.of("thinkingBudget", 0)
                 )
         );
 
